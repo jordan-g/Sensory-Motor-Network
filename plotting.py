@@ -7,14 +7,14 @@ import matplotlib.animation as animation
 class AnimationPlot:
     def __init__(self, x_min, y_min, x_max, y_max):
         # Create the figure
-        self.figure = plt.figure(figsize=((x_max - x_min)/(y_max - y_min), 4))
+        self.figure = plt.figure(figsize=((x_max - x_min)/(y_max - y_min), 4), facecolor='black')
 
     def create_texture(self, texture, texture_length):
         # Create texture x values
         self.texture_x = np.linspace(0, texture_length, 100*texture_length)
         
         # Plot the texture
-        self.texture_line, = self.animation_axis.plot([], [], color='#5C5C5C', lw=1)
+        self.texture_line, = self.animation_axis.plot([], [], color='white', lw=1)
 
     def create_whiskers(self, n_whiskers):
         # Initialize the list of whisker lines & colors
@@ -105,15 +105,15 @@ class AnimationPlot:
             deflection    = agent.whiskers.deflections[n]
 
             # Set starting x & y coordinates of the whisker
-            y_start = 0.2*agent.whisker_length*np.sin(whisker_angle)
-            x_start = agent.x + 0.2*agent.whisker_length*np.cos(whisker_angle)
+            y_start = 0.5*agent.whiskers.whisker_lengths[0]*np.sin(whisker_angle)
+            x_start = agent.x + 0.5*agent.whiskers.whisker_lengths[0]*np.cos(whisker_angle)
 
             # Set ending x & y coordinates of the whisker
-            x_end = agent.x + (agent.whisker_length - deflection)*np.cos(whisker_angle)
-            y_end = (agent.whisker_length - deflection)*np.sin(whisker_angle)
+            x_end = agent.x + (agent.whiskers.whisker_lengths[n] - deflection)*np.cos(whisker_angle)
+            y_end = (agent.whiskers.whisker_lengths[n] - deflection)*np.sin(whisker_angle)
 
             # Update the whisker color
-            self.whisker_colors[n] = deflection/agent.whisker_length
+            self.whisker_colors[n] = deflection/agent.whiskers.whisker_lengths[n]
 
             # Update the whisker line
             self.whisker_lines[n] = [(x_start, y_start), (x_end, y_end)]
@@ -132,7 +132,7 @@ class AnimationPlot:
             deflection = agent.whiskers.deflections[n]
 
             # Update the whisker deflection line color
-            self.whisker_deflection_colors[n] = deflection/agent.whisker_length
+            self.whisker_deflection_colors[n] = deflection/agent.whiskers.whisker_lengths[n]
 
         # Update the whisker line collection
         self.whisker_line_collection.set_array(self.whisker_colors)
