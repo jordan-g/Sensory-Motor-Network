@@ -19,7 +19,7 @@ max_whisker_length          = 3
 speed                       = 0.01
 total_whiskers_angle        = np.deg2rad(135)
 sensory_cells_learning_rate = 0.01
-mean_whisking_angle         = 3*np.pi/4
+mean_whisking_angle         = np.pi
 whisking_angle_amplitude    = np.pi/2
 whisking_speed              = 0.05
 
@@ -30,26 +30,25 @@ if texture_type == "sine" or texture_type == "":
     y_offset       = 1.0
     phase          = 0
     frequency      = 5
-    
     texture = textures.SineTexture(amplitude, y_offset, phase, frequency)
 elif texture_type == "spike":
     texture_length = 50
     amplitude      = 0.5
-    y_offset       = 1.5
+    y_offset       = 1.0
     phase          = 0
     frequency      = 5
     texture = textures.SpikeTexture(amplitude, y_offset, phase, frequency)
 elif texture_type == "square":
     texture_length = 50
     amplitude      = 0.5
-    y_offset       = 1.5
+    y_offset       = 1.0
     phase          = 0
     frequency      = 5
     texture = textures.SquareTexture(amplitude, y_offset, phase, frequency)
 elif texture_type == "flat":
     texture_length = 50
     amplitude      = 0
-    y_offset       = 1.5
+    y_offset       = 1.0
     texture = textures.FlatTexture(y_offset)
 else:
     raise ValueError("Invalid texture type provided.")

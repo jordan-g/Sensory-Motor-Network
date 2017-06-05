@@ -33,30 +33,30 @@ class AnimationPlot:
         self.animation_axis.set_xlim(x_min, x_max)
         self.animation_axis.set_ylim(x_min - 1, y_max + 1)
 
-    def create_whisker_deflection_plot(self, n_sensory_cells):
+    def create_whisker_deflection_plot(self, n_whiskers):
         self.whisker_deflection_axis = plt.Axes(self.figure, [0, 0.33, 1, 0.33])
         self.figure.add_axes(self.whisker_deflection_axis)
 
         self.whisker_deflection_axis.set_axis_off()
-        self.whisker_deflection_axis.set_xlim(-0.5, n_sensory_cells - 0.5)
+        self.whisker_deflection_axis.set_xlim(-0.5, n_whiskers - 0.5)
         self.whisker_deflection_axis.set_ylim(0, 1)
 
         self.whisker_deflection_lines = []
 
         # Update whisker deflection lines
-        for n in range(n_sensory_cells):
+        for n in range(n_whiskers):
             # Set starting x & y coordinates of the whisker deflection line
-            x_start = n
+            x_start = n_whiskers - n
             y_start = 0.1
 
             # Set ending x & y coordinates of the whisker deflection line
-            x_end = n
+            x_end = n_whiskers - n
             y_end = 0.9
 
             self.whisker_deflection_lines.append([(x_start, y_start), (x_end, y_end)])
 
         # Initialize the list of sensory whisker deflection colors
-        self.whisker_deflection_colors = np.linspace(0, 1, n_sensory_cells)
+        self.whisker_deflection_colors = np.linspace(0, 1, n_whiskers)
 
         # Create a line collection from the whisker deflection lines & colors
         self.whisker_deflection_line_collection = LineCollection(self.whisker_deflection_lines, array=self.whisker_deflection_colors, cmap=cm.rainbow, lw=5)
@@ -75,11 +75,11 @@ class AnimationPlot:
         # Update sensory cell activity lines
         for n in range(n_sensory_cells):
             # Set starting x & y coordinates of the cell activity line
-            x_start = n
+            x_start = n_sensory_cells - n
             y_start = 0.1
 
             # Set ending x & y coordinates of the cell activity line
-            x_end = n
+            x_end = n_sensory_cells - n
             y_end = 0.9
 
             self.sensory_cell_activity_lines.append([(x_start, y_start), (x_end, y_end)])
@@ -113,7 +113,7 @@ class AnimationPlot:
             y_end = (agent.whiskers.whisker_lengths[n] - deflection)*np.sin(whisker_angle)
 
             # Update the whisker color
-            self.whisker_colors[n] = deflection/agent.whiskers.whisker_lengths[n]
+            self.whisker_colors[n] = deflection/np.amax(agent.whiskers.whisker_lengths)
 
             # Update the whisker line
             self.whisker_lines[n] = [(x_start, y_start), (x_end, y_end)]
@@ -122,9 +122,13 @@ class AnimationPlot:
         for n in range(agent.n_sensory_cells):
             # Get cell activities
             cell_activity = agent.sensory_cells.activity[n]
+            max_activity  = np.amax(agent.sensory_cells.activity)
 
-            # Update the cell activity line color
-            self.sensory_cell_activity_colors[n] = cell_activity/np.amax(agent.sensory_cells.activity)
+            if max_activity > 0:
+                # Update the cell activity line color
+                self.sensory_cell_activity_colors[n] = cell_activity/np.amax(agent.sensory_cells.activity)
+            else:
+                self.sensory_cell_activity_colors[n] = 0
 
         # Update whisker deflection lines
         for n in range(agent.n_whiskers):

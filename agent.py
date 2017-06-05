@@ -44,23 +44,26 @@ class Whiskers:
 
         for n in range(self.n):
             whisker_angle = self.whisker_angles[n]
-            tan_whisker_angle = np.tan(whisker_angle)
-            if tan_whisker_angle == 0:
-                whisker_x_values = 0*y_range
+            if whisker_angle < np.pi:
+                tan_whisker_angle = np.tan(whisker_angle)
+                if tan_whisker_angle != 0:
+                    whisker_x_values = y_range/tan_whisker_angle
+
+                    texture_y_values = texture.value(whisker_x_values + self.origin_x)
+
+                    whisker_lengths = np.hypot(y_range, whisker_x_values)[y_range >= texture_y_values]
+
+                    if len(whisker_lengths) > 0:
+                        min_whisker_length = np.amin(whisker_lengths)
+                    else:
+                        min_whisker_length = self.whisker_lengths[n]
+
+                    deflection = np.maximum(self.whisker_lengths[n] - min_whisker_length, 0)
+                    self.deflections[n] = deflection
+                else:
+                    self.deflections[n] = 0
             else:
-                whisker_x_values = y_range/tan_whisker_angle
-
-            texture_y_values = texture.value(whisker_x_values + self.origin_x)
-
-            whisker_lengths = np.hypot(y_range, whisker_x_values)[y_range >= texture_y_values]
-
-            if len(whisker_lengths) > 0:
-                min_whisker_length = np.amin(whisker_lengths)
-            else:
-                min_whisker_length = self.whisker_lengths[n]
-
-            deflection = np.maximum(self.whisker_lengths[n] - min_whisker_length, 0)
-            self.deflections[n] = deflection
+                self.deflections[n] = 0
 
 class SensoryCells:
     def __init__(self, agent, n, n_whiskers, learning_rate):
