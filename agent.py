@@ -40,29 +40,48 @@ class Whiskers:
         self.whisker_angles = np.linspace((self.whisking_angle - self.total_whiskers_angle)/2, (self.whisking_angle + self.total_whiskers_angle)/2, self.n)
 
     def calculate_deflections(self, texture):
+        '''
+        Calculate whisker deflections.
+
+        Arguments:
+            texture (Texture) : The texture object.
+        '''
+
+        # Create a range of y values that span the texture
         y_range = np.linspace(texture.min_value(), texture.max_value(), 100)
 
         for n in range(self.n):
+            # Get the whisker angle
             whisker_angle = self.whisker_angles[n]
+
             if whisker_angle < np.pi:
+
+                # Get the tangent of the whisker angle
                 tan_whisker_angle = np.tan(whisker_angle)
+
                 if tan_whisker_angle != 0:
+                    # Get x values of points along the whisker that span the texture's y range
                     whisker_x_values = y_range/tan_whisker_angle
 
+                    # Get y values of the texture at the whisker's x values
                     texture_y_values = texture.value(whisker_x_values + self.origin_x)
 
+                    # Calculate lengths of the whisker at each of the points along the whisker that pass through the texture
                     whisker_lengths = np.hypot(y_range, whisker_x_values)[y_range >= texture_y_values]
 
+                    # Get the whisker length at which the whisker touches the texture
                     if len(whisker_lengths) > 0:
                         min_whisker_length = np.amin(whisker_lengths)
                     else:
                         min_whisker_length = self.whisker_lengths[n]
 
+                    # Set the deflection amount
                     deflection = np.maximum(self.whisker_lengths[n] - min_whisker_length, 0)
                     self.deflections[n] = deflection
                 else:
                     self.deflections[n] = 0
             else:
+                # Whisker angle is >= 180º -- deflection must be 0
                 self.deflections[n] = 0
 
 class SensoryCells:
