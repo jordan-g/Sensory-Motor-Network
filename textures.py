@@ -65,7 +65,11 @@ class SpikeTexture:
         Return the value of the texture at position x.
         Note: x can be either a scalar position (int/float) or an array of positions.
         '''
+
+        # Get the remainder after dividing x by the period
         x_mod = (x - self.phase) % self.T
+
+        # Get the total y range of the texture
         total_range = self.max_value() - self.min_value()
 
         if type(x) == int:

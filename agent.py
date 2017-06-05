@@ -1,7 +1,7 @@
 import numpy as np
 
 class Agent:
-    def __init__(self, n_whiskers, whisker_length, total_whiskers_angle, n_sensory_cells):
+    def __init__(self, n_whiskers, whisker_length, total_whiskers_angle, n_sensory_cells, sensory_cells_learning_rate):
         self.x                    = 0
         self.n_whiskers           = n_whiskers
         self.whisker_length       = whisker_length
@@ -9,7 +9,7 @@ class Agent:
         self.n_sensory_cells      = n_sensory_cells
 
         self.whiskers = Whiskers(self, self.n_whiskers, self.whisker_length, self.total_whiskers_angle)
-        self.sensory_cells = SensoryCells(self, self.n_sensory_cells, self.n_whiskers)
+        self.sensory_cells = SensoryCells(self, self.n_sensory_cells, self.n_whiskers, sensory_cells_learning_rate)
 
     def update_whisker_deflections(self, texture):
         self.whiskers.calculate_deflections(texture)
@@ -51,15 +51,16 @@ class Whiskers:
             self.deflections[n] = deflection
 
 class SensoryCells:
-    def __init__(self, agent, n, n_whiskers):
-        self.agent = agent
-        self.n = n
-        self.activity = np.zeros(self.n)
-        self.weights = np.random.normal(size=(self.n, n_whiskers))
+    def __init__(self, agent, n, n_whiskers, learning_rate):
+        self.agent         = agent
+        self.n             = n
+        self.activity      = np.zeros(self.n)
+        self.weights       = np.random.normal(size=(self.n, n_whiskers))
+        self.learning_rate = learning_rate
 
     def calculate_activity(self, input):
         self.input = input
         self.activity = np.dot(self.weights, self.input)
 
     def update_weights(self, target_activity):
-        self.weights += 0.01*np.dot((target_activity - self.activity)[:, np.newaxis], self.input[:, np.newaxis].T)
+        self.weights += self.learning_rate*np.dot((target_activity - self.activity)[:, np.newaxis], self.input[:, np.newaxis].T)

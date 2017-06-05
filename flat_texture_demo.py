@@ -10,19 +10,20 @@ import textures
 import agent
 
 # Set parameters
-n_whiskers           = 50
-n_sensory_cells      = 100
-whisker_length       = 2
-speed                = 0.01
-total_whiskers_angle = np.deg2rad(160)
-texture_length       = 50
+n_whiskers                  = 50
+n_sensory_cells             = 100
+whisker_length              = 2
+speed                       = 0.01
+total_whiskers_angle        = np.deg2rad(160)
+texture_length              = 50
+sensory_cells_learning_rate = 0.01
 
 # Create the texture
 y_offset  = 1.5
 texture = textures.FlatTexture(y_offset)
 
 # Create the agent
-agent = agent.Agent(n_whiskers, whisker_length, total_whiskers_angle, n_sensory_cells)
+agent = agent.Agent(n_whiskers, whisker_length, total_whiskers_angle, n_sensory_cells, sensory_cells_learning_rate)
 agent.update_whisker_deflections(texture)
 
 # Set up the animation plot
