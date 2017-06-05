@@ -1,15 +1,19 @@
 import numpy as np
 
 class Agent:
-    def __init__(self, n_whiskers, whisker_length, total_whiskers_angle):
-        self.x              = 0
-        self.n_whiskers     = n_whiskers
-        self.whisker_length = whisker_length
+    def __init__(self, n_whiskers, whisker_length, total_whiskers_angle, n_sensory_cells):
+        self.x                    = 0
+        self.n_whiskers           = n_whiskers
+        self.whisker_length       = whisker_length
+        self.total_whiskers_angle = total_whiskers_angle
+        self.n_sensory_cells      = n_sensory_cells
 
-        self.whiskers = Whiskers(self, n_whiskers, whisker_length, total_whiskers_angle)
+        self.whiskers = Whiskers(self, self.n_whiskers, self.whisker_length, self.total_whiskers_angle)
+        self.sensory_cells = SensoryCells(self, self.n_sensory_cells, self.n_whiskers)
 
     def update_whisker_deflections(self, texture):
         self.whiskers.calculate_deflections(texture)
+        self.sensory_cells.calculate_activity(self.whiskers.deflections)
 
     def move(self, speed):
         self.x += speed
@@ -47,10 +51,15 @@ class Whiskers:
             self.deflections[n] = deflection
 
 class SensoryCells:
-    def __init__(self, agent, n):
+    def __init__(self, agent, n, n_whiskers):
         self.agent = agent
         self.n = n
         self.activity = np.zeros(self.n)
+        self.weights = np.random.normal(size=(self.n, n_whiskers))
 
     def calculate_activity(self, input):
-        pass
+        self.input = input
+        self.activity = np.dot(self.weights, self.input)
+
+    def update_weights(self, target_activity):
+        self.weights += 0.01*np.dot((target_activity - self.activity)[:, np.newaxis], self.input[:, np.newaxis].T)
